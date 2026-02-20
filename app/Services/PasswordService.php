@@ -6,7 +6,81 @@ use InvalidArgumentException;
 
 class PasswordService
 {
-    // Aquí pegas las funciones del profe convertidas a métodos de clase
+    // ==================== CONFIGURACIÓN DE LÍMITES ====================
+    
+    /**
+     * Longitud mínima permitida para contraseñas
+     */
+    public const LENGTH_MIN = 4;
+    
+    /**
+     * Longitud máxima permitida para contraseñas
+     */
+    public const LENGTH_MAX = 128;
+    
+    /**
+     * Longitud por defecto de contraseñas
+     */
+    public const LENGTH_DEFAULT = 16;
+    
+    /**
+     * Longitud recomendada mínima para seguridad
+     */
+    public const LENGTH_RECOMMENDED_MIN = 12;
+    
+    /**
+     * Longitud óptima para máxima seguridad
+     */
+    public const LENGTH_OPTIMAL = 16;
+    
+    /**
+     * Número mínimo de contraseñas a generar
+     */
+    public const COUNT_MIN = 1;
+    
+    /**
+     * Número máximo de contraseñas a generar
+     */
+    public const COUNT_MAX = 100;
+    
+    /**
+     * Número por defecto de contraseñas a generar
+     */
+    public const COUNT_DEFAULT = 5;
+    
+    /**
+     * Longitud máxima permitida para el parámetro exclude
+     */
+    public const EXCLUDE_MAX_LENGTH = 100;
+    
+    // ==================== CONJUNTOS DE CARACTERES ====================
+    
+    /**
+     * Letras mayúsculas
+     */
+    public const CHARSET_UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    
+    /**
+     * Letras minúsculas
+     */
+    public const CHARSET_LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
+    
+    /**
+     * Dígitos
+     */
+    public const CHARSET_DIGITS = '0123456789';
+    
+    /**
+     * Símbolos especiales comunes
+     */
+    public const CHARSET_SYMBOLS = '!@#$%^&*()-_=+[]{}|;:,.<>?';
+    
+    /**
+     * Caracteres ambiguos que pueden confundirse
+     */
+    public const CHARSET_AMBIGUOUS = 'Il1O0o';
+    
+    // ==================== MÉTODOS PRIVADOS ====================
     
     private function secureRandomInt(int $min, int $max): int 
     {
@@ -29,23 +103,32 @@ class PasswordService
     /**
      * Genera una contraseña segura.
      *
-     * @param int $length Longitud deseada (>=1).
+     * @param int $length Longitud deseada (entre LENGTH_MIN y LENGTH_MAX).
      * @param array $opts Opciones:
      *    - upper (bool)  : incluir mayúsculas [A-Z]
      *    - lower (bool)  : incluir minúsculas [a-z]
      *    - digits (bool) : incluir dígitos [0-9]
      *    - symbols (bool): incluir símbolos [!@#$...]
      *    - avoid_ambiguous (bool) : evitar caracteres ambiguos (Il1O0 etc.)
-     *    - exclude (string) : caracteres a excluir explícitamente
+     *    - exclude (string) : caracteres a excluir explícitamente (máx EXCLUDE_MAX_LENGTH)
      *    - require_each (bool) : garantizar al menos 1 carácter de cada categoría seleccionada
      *
      * @return string contraseña
      * @throws InvalidArgumentException
      */
-    public function generate(int $length = 16, array $opts = []): string 
+    public function generate(int $length = self::LENGTH_DEFAULT, array $opts = []): string 
     {
-        if ($length < 1) {
-            throw new InvalidArgumentException("La longitud debe ser >= 1");
+        // Validar longitud
+        if ($length < self::LENGTH_MIN) {
+            throw new InvalidArgumentException(
+                "La longitud debe ser >= " . self::LENGTH_MIN
+            );
+        }
+        
+        if ($length > self::LENGTH_MAX) {
+            throw new InvalidArgumentException(
+                "La longitud debe ser <= " . self::LENGTH_MAX
+            );
         }
 
         // Opciones por defecto
@@ -58,23 +141,21 @@ class PasswordService
             'exclude' => '',
             'require_each' => true,
         ], $opts);
+        
+        // Validar que exclude no sea excesivamente largo
+        if (strlen($opts['exclude']) > self::EXCLUDE_MAX_LENGTH) {
+            throw new InvalidArgumentException(
+                "El parámetro 'exclude' no puede exceder " . self::EXCLUDE_MAX_LENGTH . " caracteres"
+            );
+        }
 
-        // Conjuntos de caracteres
+        // Conjuntos de caracteres usando constantes
         $sets = [];
 
-        $upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $lower = 'abcdefghijklmnopqrstuvwxyz';
-        $digits = '0123456789';
-        // símbolos comunes; puedes editar según tus políticas
-        $symbols = '!@#$%^&*()-_=+[]{}|;:,.<>?';
-
-        // caracteres ambiguos que a veces se evitan
-        $ambiguous = 'Il1O0o';
-
-        if ($opts['upper']) $sets['upper'] = $upper;
-        if ($opts['lower']) $sets['lower'] = $lower;
-        if ($opts['digits']) $sets['digits'] = $digits;
-        if ($opts['symbols']) $sets['symbols'] = $symbols;
+        if ($opts['upper']) $sets['upper'] = self::CHARSET_UPPERCASE;
+        if ($opts['lower']) $sets['lower'] = self::CHARSET_LOWERCASE;
+        if ($opts['digits']) $sets['digits'] = self::CHARSET_DIGITS;
+        if ($opts['symbols']) $sets['symbols'] = self::CHARSET_SYMBOLS;
 
         if (empty($sets)) {
             throw new InvalidArgumentException("Debe activarse al menos una categoría (upper/lower/digits/symbols).");
@@ -83,7 +164,7 @@ class PasswordService
         // construir pool total y aplicar exclusiones
         $exclude_chars = $opts['exclude'];
         if ($opts['avoid_ambiguous']) {
-            $exclude_chars .= $ambiguous;
+            $exclude_chars .= self::CHARSET_AMBIGUOUS;
         }
 
         // normalizar exclusions a conjunto único
@@ -132,13 +213,106 @@ class PasswordService
         return $password;
     }
 
-    public function generateMany(int $count = 5, int $length = 16, array $opts = []): array 
+    /**
+     * Genera múltiples contraseñas a la vez.
+     *
+     * @param int $count número de contraseñas (entre COUNT_MIN y COUNT_MAX)
+     * @param int $length longitud de cada contraseña
+     * @param array $opts opciones (ver generate)
+     * @return array lista de contraseñas
+     * @throws InvalidArgumentException
+     */
+    public function generateMany(int $count = self::COUNT_DEFAULT, int $length = self::LENGTH_DEFAULT, array $opts = []): array 
     {
+        // Validar count
+        if ($count < self::COUNT_MIN) {
+            throw new InvalidArgumentException(
+                "El número de contraseñas debe ser >= " . self::COUNT_MIN
+            );
+        }
+        
+        if ($count > self::COUNT_MAX) {
+            throw new InvalidArgumentException(
+                "El número de contraseñas debe ser <= " . self::COUNT_MAX
+            );
+        }
+        
         $passwords = [];
         for ($i = 0; $i < $count; $i++) {
             $passwords[] = $this->generate($length, $opts);
         }
         return $passwords;
+    }
+    
+    /**
+     * Obtiene la configuración de parámetros y límites del servicio.
+     *
+     * @return array Configuración completa de parámetros
+     */
+    public function getConfiguration(): array
+    {
+        return [
+            'length' => [
+                'min' => self::LENGTH_MIN,
+                'max' => self::LENGTH_MAX,
+                'default' => self::LENGTH_DEFAULT,
+                'recommended_min' => self::LENGTH_RECOMMENDED_MIN,
+                'optimal' => self::LENGTH_OPTIMAL,
+            ],
+            'count' => [
+                'min' => self::COUNT_MIN,
+                'max' => self::COUNT_MAX,
+                'default' => self::COUNT_DEFAULT,
+            ],
+            'exclude' => [
+                'max_length' => self::EXCLUDE_MAX_LENGTH,
+            ],
+            'charsets' => [
+                'uppercase' => self::CHARSET_UPPERCASE,
+                'lowercase' => self::CHARSET_LOWERCASE,
+                'digits' => self::CHARSET_DIGITS,
+                'symbols' => self::CHARSET_SYMBOLS,
+                'ambiguous' => self::CHARSET_AMBIGUOUS,
+            ],
+            'options' => [
+                'upper' => [
+                    'type' => 'boolean',
+                    'default' => true,
+                    'description' => 'Incluir letras mayúsculas [A-Z]',
+                ],
+                'lower' => [
+                    'type' => 'boolean',
+                    'default' => true,
+                    'description' => 'Incluir letras minúsculas [a-z]',
+                ],
+                'digits' => [
+                    'type' => 'boolean',
+                    'default' => true,
+                    'description' => 'Incluir números [0-9]',
+                ],
+                'symbols' => [
+                    'type' => 'boolean',
+                    'default' => true,
+                    'description' => 'Incluir símbolos especiales',
+                ],
+                'avoid_ambiguous' => [
+                    'type' => 'boolean',
+                    'default' => true,
+                    'description' => 'Evitar caracteres ambiguos (I, l, 1, O, 0, o)',
+                ],
+                'exclude' => [
+                    'type' => 'string',
+                    'default' => '',
+                    'max_length' => self::EXCLUDE_MAX_LENGTH,
+                    'description' => 'Caracteres específicos a excluir',
+                ],
+                'require_each' => [
+                    'type' => 'boolean',
+                    'default' => true,
+                    'description' => 'Garantizar al menos 1 carácter de cada categoría seleccionada',
+                ],
+            ],
+        ];
     }
 
     /**

@@ -1,3 +1,164 @@
+<p align="center">
+  <h1 align="center">🔐 Password Generation & Validation API</h1>
+  <p align="center">API segura para generación y validación de contraseñas con entropía criptográfica</p>
+</p>
+
+## 📚 Documentación
+
+- **[API Documentation](API_DOCUMENTATION.md)** - Documentación completa de endpoints con ejemplos
+- **[Parameters Specification](PARAMETERS_SPECIFICATION.md)** - Especificación detallada de parámetros y límites
+- **[Quick Reference](QUICK_REFERENCE.md)** - Referencia rápida de la API
+- **[API Tests](api-tests.http)** - Colección de pruebas HTTP para REST Client
+
+## 🚀 Características
+
+- ✅ Generación de contraseñas con entropía criptográfica (`random_int()`)
+- ✅ Validación y análisis de fortaleza de contraseñas
+- ✅ Fisher-Yates shuffle para mezcla segura de caracteres
+- ✅ Parámetros personalizables (longitud, tipos de caracteres, exclusiones)
+- ✅ Detección de patrones débiles (secuencias, repeticiones, teclado)
+- ✅ Validaciones robustas con Form Requests
+- ✅ Configuración flexible mediante variables de entorno
+- ✅ API RESTful con respuestas JSON
+
+## 📡 Endpoints
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/api/password/config` | Obtener configuración de parámetros |
+| `POST` | `/api/password/generate` | Generar una contraseña |
+| `POST` | `/api/password/generate-multiple` | Generar múltiples contraseñas |
+| `POST` | `/api/password/validate` | Validar fortaleza de contraseña |
+
+## 🎯 Especificación de Parámetros
+
+### Longitud (length)
+- **Mínimo:** 4 caracteres
+- **Máximo:** 128 caracteres
+- **Por defecto:** 16 caracteres
+- **Recomendado:** 12+ caracteres
+
+### Cantidad (count)
+- **Mínimo:** 1 contraseña
+- **Máximo:** 100 contraseñas
+- **Por defecto:** 5 contraseñas
+
+### Tipos de Caracteres
+- **upper** (boolean): Mayúsculas A-Z
+- **lower** (boolean): Minúsculas a-z
+- **digits** (boolean): Números 0-9
+- **symbols** (boolean): Símbolos especiales !@#$%^&*...
+
+### Exclusiones
+- **exclude** (string): Caracteres a excluir (máx. 100)
+- **avoid_ambiguous** (boolean): Evitar I, l, 1, O, 0, o
+
+### Patrones
+- **require_each** (boolean): Garantizar al menos 1 carácter de cada categoría activa
+
+## 💻 Instalación y Uso
+
+### Requisitos
+- PHP 8.1+
+- Laravel 11.x
+- Composer
+
+### Instalación
+
+```bash
+# Clonar repositorio
+git clone <repository-url>
+cd password-api
+
+# Instalar dependencias
+composer install
+
+# Configurar entorno
+cp .env.example .env
+php artisan key:generate
+
+# Iniciar servidor
+php artisan serve
+```
+
+### Ejemplo de Uso
+
+```bash
+# Obtener configuración
+curl http://localhost:8000/api/password/config
+
+# Generar contraseña
+curl -X POST http://localhost:8000/api/password/generate \
+  -H "Content-Type: application/json" \
+  -d '{"length": 20, "symbols": true}'
+
+# Validar contraseña
+curl -X POST http://localhost:8000/api/password/validate \
+  -H "Content-Type: application/json" \
+  -d '{"password": "MyP@ssw0rd2024!"}'
+```
+
+## 🔒 Seguridad
+
+- **Entropía criptográfica:** Usa `random_int()` de PHP 7+
+- **Mezcla segura:** Implementa Fisher-Yates shuffle
+- **Validaciones:** Form Requests para todas las entradas
+- **Límites:** Prevención de abuso con límites configurables
+- **Sin almacenamiento:** No se guardan las contraseñas generadas
+
+## ⚙️ Configuración
+
+Personaliza los límites en tu archivo `.env`:
+
+```env
+PASSWORD_LENGTH_MIN=4
+PASSWORD_LENGTH_MAX=128
+PASSWORD_LENGTH_DEFAULT=16
+PASSWORD_COUNT_MAX=100
+PASSWORD_EXCLUDE_MAX_LENGTH=100
+```
+
+Ver [config/password.php](config/password.php) para todas las opciones.
+
+## 📊 Validación de Contraseñas
+
+El endpoint de validación analiza:
+- ✅ Fortaleza (score 0-100)
+- ✅ Composición (mayúsculas, minúsculas, dígitos, símbolos)
+- ✅ Diversidad de caracteres
+- ✅ Patrones débiles detectados
+- ✅ Tiempo estimado de crackeo
+- ✅ Recomendaciones de mejora
+
+### Niveles de Fortaleza
+
+| Score | Nivel | Etiqueta |
+|-------|-------|----------|
+| 80-100 | `muy_fuerte` | 🟢 Muy Fuerte |
+| 60-79 | `fuerte` | 🔵 Fuerte |
+| 40-59 | `moderada` | 🟡 Moderada |
+| 20-39 | `debil` | 🟠 Débil |
+| 0-19 | `muy_debil` | 🔴 Muy Débil |
+
+## 🧪 Pruebas
+
+Usa el archivo [api-tests.http](api-tests.http) con la extensión REST Client de VS Code para probar todos los endpoints.
+
+```bash
+# O con PHPUnit
+php artisan test
+```
+
+## 📝 Licencia
+
+Este proyecto usa Laravel, que es un framework open-source bajo la licencia MIT.
+
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas. Por favor, abre un issue o pull request para mejoras o correcciones.
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\PasswordService;
-use Illuminate\Http\Request;
+use App\Http\Requests\GeneratePasswordRequest;
+use App\Http\Requests\GenerateMultiplePasswordsRequest;
+use App\Http\Requests\ValidatePasswordRequest;
 use Illuminate\Http\JsonResponse;
 use InvalidArgumentException;
 
@@ -41,10 +43,10 @@ class PasswordController extends Controller
      *   "require_each": true
      * }
      *
-     * @param Request $request
+     * @param GeneratePasswordRequest $request
      * @return JsonResponse
      */
-    public function generate(Request $request): JsonResponse
+    public function generate(GeneratePasswordRequest $request): JsonResponse
     {
         try {
             $length = $request->input('length', 16);
@@ -99,10 +101,10 @@ class PasswordController extends Controller
      *   "require_each": true
      * }
      *
-     * @param Request $request
+     * @param GenerateMultiplePasswordsRequest $request
      * @return JsonResponse
      */
-    public function generateMultiple(Request $request): JsonResponse
+    public function generateMultiple(GenerateMultiplePasswordsRequest $request): JsonResponse
     {
         try {
             $count = $request->input('count', 5);
@@ -151,30 +153,13 @@ class PasswordController extends Controller
      *   "password": "MyP@ssw0rd123!"
      * }
      *
-     * @param Request $request
+     * @param ValidatePasswordRequest $request
      * @return JsonResponse
      */
-    public function validate(Request $request): JsonResponse
+    public function validate(ValidatePasswordRequest $request): JsonResponse
     {
         try {
-            $password = $request->input('password');
-
-            // Validar que se envió una contraseña
-            if (empty($password)) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'El campo "password" es requerido'
-                ], 400);
-            }
-
-            // Validar que sea un string
-            if (!is_string($password)) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'El campo "password" debe ser una cadena de texto'
-                ], 400);
-            }
-
+            $password = $request->validated()['password'];
             $validation = $this->passwordService->validate($password);
 
             return response()->json([
@@ -186,6 +171,33 @@ class PasswordController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'Error al validar la contraseña'
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtiene la configuración de parámetros y límites de la API.
+     *
+     * GET /api/password/config
+     *
+     * @return JsonResponse
+     */
+    public function getConfiguration(): JsonResponse
+    {
+        try {
+            $config = $this->passwordService->getConfiguration();
+
+            return response()->json([
+                'success' => true,
+                'configuration' => $config,
+                'version' => '1.0.0',
+                'description' => 'API de Generación y Validación de Contraseñas Seguras'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener la configuración'
             ], 500);
         }
     }

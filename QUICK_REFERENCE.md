@@ -2,6 +2,23 @@
 
 ## 🎯 Endpoints Disponibles
 
+### 0. **GET** `/api/password/config` 🆕
+Obtiene la configuración de parámetros y límites
+
+**Respuesta:**
+```json
+{
+  "success": true,
+  "configuration": {
+    "length": {"min": 4, "max": 128, "default": 16},
+    "count": {"min": 1, "max": 100, "default": 5},
+    ...
+  }
+}
+```
+
+---
+
 ### 1. **POST** `/api/password/generate`
 Genera una contraseña segura
 
@@ -71,16 +88,17 @@ Valida la fortaleza de una contraseña
 
 ## ⚙️ Parámetros Comunes
 
-| Parámetro | Tipo | Default | Descripción |
-|-----------|------|---------|-------------|
-| `length` | int | 16 | Longitud de la contraseña |
-| `upper` | bool | true | Incluir mayúsculas (A-Z) |
-| `lower` | bool | true | Incluir minúsculas (a-z) |
-| `digits` | bool | true | Incluir números (0-9) |
-| `symbols` | bool | true | Incluir símbolos (!@#$...) |
-| `avoid_ambiguous` | bool | true | Evitar (I,l,1,O,0,o) |
-| `exclude` | string | "" | Caracteres a excluir |
-| `require_each` | bool | true | Garantizar 1 de cada tipo |
+| Parámetro | Tipo | Default | Mín | Máx | Descripción |
+|-----------|------|---------|-----|-----|-------------|
+| `length` | int | 16 | 4 | 128 | Longitud de la contraseña |
+| `count` | int | 5 | 1 | 100 | Número de contraseñas (solo multiple) |
+| `upper` | bool | true | - | - | Incluir mayúsculas (A-Z) |
+| `lower` | bool | true | - | - | Incluir minúsculas (a-z) |
+| `digits` | bool | true | - | - | Incluir números (0-9) |
+| `symbols` | bool | true | - | - | Incluir símbolos (!@#$...) |
+| `avoid_ambiguous` | bool | true | - | - | Evitar (I,l,1,O,0,o) |
+| `exclude` | string | "" | 0 | 100 | Caracteres a excluir |
+| `require_each` | bool | true | - | - | Garantizar 1 de cada tipo |
 
 ---
 

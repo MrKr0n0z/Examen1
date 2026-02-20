@@ -2,6 +2,11 @@
 
 ## Archivo de pruebas para API REST Client (REST Client extension de VS Code)
 
+### 0. Obtener configuración de la API
+GET http://localhost/api/password/config
+
+###
+
 ### 1. Generar una contraseña simple
 POST http://localhost/api/password/generate
 Content-Type: application/json
@@ -213,6 +218,129 @@ Content-Type: application/json
   "lower": false,
   "digits": false,
   "symbols": false
+}
+
+###
+
+### 20. Error: Longitud máxima excedida
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 150
+}
+
+###
+
+### 21. Error: Count máximo excedido
+POST http://localhost/api/password/generate-multiple
+Content-Type: application/json
+
+{
+  "count": 150,
+  "length": 16
+}
+
+###
+
+### 22. Error: Exclude muy largo
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 16,
+  "exclude": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+}
+
+###
+
+### 23. Contraseña con longitud mínima
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 4,
+  "upper": true,
+  "lower": true,
+  "digits": true,
+  "symbols": true,
+  "require_each": true
+}
+
+###
+
+### 24. Contraseña con longitud máxima
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 128
+}
+
+###
+
+### 25. Generar 1 contraseña (mínimo)
+POST http://localhost/api/password/generate-multiple
+Content-Type: application/json
+
+{
+  "count": 1,
+  "length": 16
+}
+
+###
+
+### 26. Generar 100 contraseñas (máximo)
+POST http://localhost/api/password/generate-multiple
+Content-Type: application/json
+
+{
+  "count": 100,
+  "length": 12
+}
+
+###
+
+### 27. Error: require_each con longitud insuficiente
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 2,
+  "upper": true,
+  "lower": true,
+  "digits": true,
+  "symbols": true,
+  "require_each": true
+}
+
+###
+
+### 28. Contraseña solo con mayúsculas
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 16,
+  "upper": true,
+  "lower": false,
+  "digits": false,
+  "symbols": false
+}
+
+###
+
+### 29. Contraseña alfanumérica óptima
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 16,
+  "upper": true,
+  "lower": true,
+  "digits": true,
+  "symbols": false,
+  "avoid_ambiguous": true
 }
 
 ###

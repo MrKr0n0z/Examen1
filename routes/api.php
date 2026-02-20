@@ -9,6 +9,9 @@ use App\Http\Controllers\PasswordController;
  * Todas las rutas tienen el prefijo /api automáticamente
  */
 
+// Ruta para obtener la configuración de parámetros
+Route::get('/password/config', [PasswordController::class, 'getConfiguration']);
+
 // Ruta para generar una contraseña
 Route::post('/password/generate', [PasswordController::class, 'generate']);
 
