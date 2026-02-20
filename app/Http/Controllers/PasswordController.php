@@ -140,4 +140,53 @@ class PasswordController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Valida la fortaleza de una contraseña.
+     *
+     * POST /api/password/validate
+     * 
+     * Body (JSON):
+     * {
+     *   "password": "MyP@ssw0rd123!"
+     * }
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function validate(Request $request): JsonResponse
+    {
+        try {
+            $password = $request->input('password');
+
+            // Validar que se envió una contraseña
+            if (empty($password)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'El campo "password" es requerido'
+                ], 400);
+            }
+
+            // Validar que sea un string
+            if (!is_string($password)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'El campo "password" debe ser una cadena de texto'
+                ], 400);
+            }
+
+            $validation = $this->passwordService->validate($password);
+
+            return response()->json([
+                'success' => true,
+                'data' => $validation
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al validar la contraseña'
+            ], 500);
+        }
+    }
 }

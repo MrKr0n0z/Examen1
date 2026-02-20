@@ -14,3 +14,6 @@ Route::post('/password/generate', [PasswordController::class, 'generate']);
 
 // Ruta para generar múltiples contraseñas
 Route::post('/password/generate-multiple', [PasswordController::class, 'generateMultiple']);
+
+// Ruta para validar la fortaleza de una contraseña
+Route::post('/password/validate', [PasswordController::class, 'validate']);

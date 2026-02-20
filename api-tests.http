@@ -1,0 +1,218 @@
+# Ejemplos de Requests - Password API
+
+## Archivo de pruebas para API REST Client (REST Client extension de VS Code)
+
+### 1. Generar una contraseña simple
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 16
+}
+
+###
+
+### 2. Generar una contraseña sin símbolos
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 12,
+  "symbols": false
+}
+
+###
+
+### 3. Generar una contraseña larga y compleja
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 24,
+  "upper": true,
+  "lower": true,
+  "digits": true,
+  "symbols": true,
+  "avoid_ambiguous": true,
+  "require_each": true
+}
+
+###
+
+### 4. Generar una contraseña sin caracteres ambiguos
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 16,
+  "avoid_ambiguous": false
+}
+
+###
+
+### 5. Generar una contraseña excluyendo caracteres específicos
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 16,
+  "exclude": "aeiouAEIOU"
+}
+
+###
+
+### 6. Generar solo con letras y números (sin símbolos)
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 20,
+  "upper": true,
+  "lower": true,
+  "digits": true,
+  "symbols": false
+}
+
+###
+
+### 7. Generar múltiples contraseñas (5 por defecto)
+POST http://localhost/api/password/generate-multiple
+Content-Type: application/json
+
+{
+  "count": 5,
+  "length": 16
+}
+
+###
+
+### 8. Generar 10 contraseñas cortas
+POST http://localhost/api/password/generate-multiple
+Content-Type: application/json
+
+{
+  "count": 10,
+  "length": 12,
+  "symbols": false
+}
+
+###
+
+### 9. Generar 3 contraseñas ultra seguras
+POST http://localhost/api/password/generate-multiple
+Content-Type: application/json
+
+{
+  "count": 3,
+  "length": 32,
+  "upper": true,
+  "lower": true,
+  "digits": true,
+  "symbols": true,
+  "avoid_ambiguous": true,
+  "require_each": true
+}
+
+###
+
+### 10. Validar una contraseña fuerte
+POST http://localhost/api/password/validate
+Content-Type: application/json
+
+{
+  "password": "MySecureP@ssw0rd2024!"
+}
+
+###
+
+### 11. Validar una contraseña débil
+POST http://localhost/api/password/validate
+Content-Type: application/json
+
+{
+  "password": "123456"
+}
+
+###
+
+### 12. Validar una contraseña con patrones
+POST http://localhost/api/password/validate
+Content-Type: application/json
+
+{
+  "password": "abcd1234"
+}
+
+###
+
+### 13. Validar una contraseña moderada
+POST http://localhost/api/password/validate
+Content-Type: application/json
+
+{
+  "password": "Test1234"
+}
+
+###
+
+### 14. Validar una contraseña muy fuerte
+POST http://localhost/api/password/validate
+Content-Type: application/json
+
+{
+  "password": "Xk9#mP2$vR7!qN5@wL8^"
+}
+
+###
+
+### 15. Validar contraseña con caracteres repetidos
+POST http://localhost/api/password/validate
+Content-Type: application/json
+
+{
+  "password": "Passssword123!!!"
+}
+
+###
+
+### 16. Error: Contraseña vacía
+POST http://localhost/api/password/validate
+Content-Type: application/json
+
+{
+  "password": ""
+}
+
+###
+
+### 17. Error: Sin campo password
+POST http://localhost/api/password/validate
+Content-Type: application/json
+
+{}
+
+###
+
+### 18. Error: Longitud inválida
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 0
+}
+
+###
+
+### 19. Error: Ninguna categoría activa
+POST http://localhost/api/password/generate
+Content-Type: application/json
+
+{
+  "length": 16,
+  "upper": false,
+  "lower": false,
+  "digits": false,
+  "symbols": false
+}
+
+###
