@@ -98,6 +98,24 @@ class GeneratePasswordRequest extends FormRequest
                     );
                 }
             }
+            
+            // Validación de seguridad: Sanitizar exclude para prevenir inyecciones
+            $exclude = $this->input('exclude', '');
+            if (!empty($exclude) && !$this->isSafeString($exclude)) {
+                $validator->errors()->add(
+                    'exclude',
+                    'El parámetro exclude contiene caracteres no permitidos'
+                );
+            }
         });
+    }
+    
+    /**
+     * Verifica que una cadena sea segura (solo caracteres imprimibles).
+     */
+    private function isSafeString(string $str): bool
+    {
+        // Solo permitir caracteres ASCII imprimibles (32-126)
+        return preg_match('/^[\x20-\x7E]*$/', $str) === 1;
     }
 }

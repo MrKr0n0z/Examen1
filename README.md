@@ -7,6 +7,7 @@
 
 - **[API Documentation](API_DOCUMENTATION.md)** - Documentación completa de endpoints con ejemplos
 - **[Parameters Specification](PARAMETERS_SPECIFICATION.md)** - Especificación detallada de parámetros y límites
+- **[Security Documentation](SECURITY.md)** - Guía de seguridad y validaciones
 - **[Quick Reference](QUICK_REFERENCE.md)** - Referencia rápida de la API
 - **[API Tests](api-tests.http)** - Colección de pruebas HTTP para REST Client
 
@@ -102,9 +103,25 @@ curl -X POST http://localhost:8000/api/password/validate \
 
 - **Entropía criptográfica:** Usa `random_int()` de PHP 7+
 - **Mezcla segura:** Implementa Fisher-Yates shuffle
-- **Validaciones:** Form Requests para todas las entradas
-- **Límites:** Prevención de abuso con límites configurables
+- **Validaciones robustas:** Form Requests con sanitización
+- **Rate limiting:** 60 requests/minuto, 500 contraseñas/minuto por IP
+- **Límites estrictos:** Prevención de abuso con límites configurables
+- **Manejo de errores:** Respuestas consistentes sin exponer detalles
+- **Logging:** Registro de errores para auditoría (sin guardar contraseñas)
 - **Sin almacenamiento:** No se guardan las contraseñas generadas
+
+### Límites de Seguridad
+
+| Parámetro | Límite | Razón |
+|-----------|--------|-------|
+| length | 4-128 | Balance entre usabilidad y prevención de abuso |
+| count | 1-100 | Prevención de DoS |
+| exclude | 0-100 chars | Límite razonable para exclusiones |
+| Total chars | 10,000/request | Protección de memoria y CPU |
+| Rate limit | 60/min/IP | Anti-abuso |
+| Passwords | 500/min/IP | Límite de generación masiva |
+
+Ver [SECURITY.md](SECURITY.md) para detalles completos.
 
 ## ⚙️ Configuración
 

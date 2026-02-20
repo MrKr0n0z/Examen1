@@ -106,6 +106,36 @@ class GenerateMultiplePasswordsRequest extends FormRequest
                     );
                 }
             }
+            
+            // Validación de seguridad: Prevenir generación masiva abusiva
+            $count = $this->input('count', PasswordService::COUNT_DEFAULT);
+            $length = $this->input('length', PasswordService::LENGTH_DEFAULT);
+            
+            // Prevenir generación de más de 10,000 caracteres en total
+            $totalChars = $count * $length;
+            if ($totalChars > 10000) {
+                $validator->errors()->add(
+                    'count',
+                    'El total de caracteres a generar (' . $totalChars . ') excede el límite de 10,000'
+                );
+            }
+            
+            // Validación de seguridad: Sanitizar exclude
+            $exclude = $this->input('exclude', '');
+            if (!empty($exclude) && !$this->isSafeString($exclude)) {
+                $validator->errors()->add(
+                    'exclude',
+                    'El parámetro exclude contiene caracteres no permitidos'
+                );
+            }
         });
+    }
+    
+    /**
+     * Verifica que una cadena sea segura (solo caracteres imprimibles).
+     */
+    private function isSafeString(string $str): bool
+    {
+        return preg_match('/^[\x20-\x7E]*$/', $str) === 1;
     }
 }

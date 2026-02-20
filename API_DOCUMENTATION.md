@@ -13,7 +13,7 @@
 
 ## Información General
 
-**URL Base:** `http://localhost/api` (o tu dominio configurado)
+**URL Base:** `http://password.test` 
 
 **Formato de Respuesta:** JSON
 
